@@ -10,12 +10,10 @@
 
 local locale = system.getLocale()
 
-local function name(widget)
-  return "FLOWMETER"
-end
-
 local localeTexts = {
+	widgetName = {en="FLOWMETER", fr="DEBITMETRE", de="FLOWMETER", es="es"},
 	tankCapacity = {en="Tank capacity", fr="Capacité réservoir", de="Tank Inhalt", es="es"},
+	pulsesName = {en="Pulses/L", fr="Impulsions/L", de= "Pulses/L", es="es"},
 	}
 	
 local function localize(key)
@@ -23,16 +21,24 @@ local function localize(key)
 end
 
 local tankCapacity
-local newValue
+local newValueTank
+local pulses
+local newValuePulse
+
+local function name(widget)
+  return localize("widgetName")
+end
 
 local function create(widget)
+	local sensorTank = system.getSource({category=CATEGORY_TELEMETRY, appId=0x5201})
+	tankCapacity = sensorTank:value()
+	newValueTank = sensorTank:value()
 	
-	local sensor = system.getSource({category=CATEGORY_TELEMETRY, appId=0x0D30})
-	tankCapacity = sensor:value()
-	newValue = sensor:value()
-	local line = form.addLine("appId")
-	local physIdField = form.addStaticText(line, nil, string.format('0x%04x',sensor:appId()))
-	
+	local sensorPulse = {}
+	local sensorPulse = system.getSource({category=CATEGORY_TELEMETRY, appId=0x5200})
+	pulses = sensorPulse:value()
+	newValuePulse = sensorPulse:value()
+
   	-- Fuel Tank capacity
 	local line = form.addLine(localize("tankCapacity"))
 	local tankField = form.addNumberField(line, nil, 0 , 9999,
@@ -42,16 +48,34 @@ local function create(widget)
 	tankField:default(2000)
 	tankField:step(50)
 	tankField:suffix(" ml")
+	
+	-- Pulses Config
+	local line = form.addLine(localize("pulsesName"))
+	local pulsesField = form.addNumberField(line, nil, 0 , 9999,
+		function() return pulses end,
+		function(value) pulses=value
+		end)
+	pulsesField:default(2500)
+	pulsesField:step(1)
+
 	return {}
 end
 
 local function wakeup(widget)
-	if newValue ~= tankCapacity then
+	if newValueTank ~= tankCapacity then
 		local sensorTank={}
-		sensorTank = sport.getSensor({appId = 0x0D30})
-		sensorTank:pushFrame({physId=0x1B, primId=0x31, appId=0x0D30, value=tankCapacity})
-		newValue = tankCapacity
+		sensorTank = sport.getSensor({appId = 0x5201})
+		sensorTank:pushFrame({physId=0x1B, primId=0x31, appId=0x5201, value=tankCapacity})
+		newValueTank = tankCapacity
 	end
+	
+	if newValuePulse ~= pulses then
+		local sensorPulses={}
+		sensorPulses = sport.getSensor({appId = 0x5200})
+		sensorPulses:pushFrame({physId=0x1B, primId=0x31, appId=0x5200, value=pulses})
+		newValuePulse = pulses
+	end
+
 end
 
 local icon = lcd.loadMask("./flowmeter.png")
