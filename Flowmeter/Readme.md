@@ -1,7 +1,9 @@
 This module will use the BioTech flowmeter or any other flowmeter and report to the telemetry as a Gassuite with 3 values
-- Fuel Remaining . You need a lua to program the 0x0D30 value from the script
+- Fuel Remaining .
 - Average flow
 - Max Flow
+
+Don't forget to discover the 2 DIY sensors (5200/ 5201) to use the widget
 
 The widget will permit to save in the sensor, the tank Capacity and also the Pulses/L depending of the flowmeter.
 
