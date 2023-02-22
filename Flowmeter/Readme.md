@@ -1,7 +1,11 @@
-This module will use the BioTech flowmeter and report to the telemetry as a Gassuite with 3 values
+This module will use the BioTech flowmeter or any other flowmeter and report to the telemetry as a Gassuite with 3 values
 - Fuel Remaining . You need a lua to program the 0x0D30 value from the script
 - Average flow
 - Max Flow
+
+The widget will permit to save in the sensor, the tank Capacity and also the Pulses/L depending of the flowmeter.
+
+The Biotech is about 2500 pulses/L, and you need to adjust after few flights
 
 This module can be used with Kingtech Lua Script or using a standard widget value
 
